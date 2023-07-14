@@ -1,0 +1,158 @@
+Create database Film;
+CREATE TABLE Artist (
+  Art_id INT PRIMARY KEY,
+  Art_name VARCHAR(255) NOT NULL,
+  Art_gender VARCHAR(10)
+  );
+  INSERT INTO ARTIST VALUES(101,'John','M'),
+  (102,'Ana','F'),
+  (103,'Joseph','M'),
+ (104,'Scarlett Johansson', 'F'),
+ (105,'Leonardo DiCaprio', 'M');
+  
+  
+  Select *FROM ARTIST;
+  
+  CREATE TABLE Producer (
+  prod_id INT PRIMARY KEY,
+  prod_name VARCHAR(255) NOT NULL,
+  prod_phone BIGINT
+);
+
+INSERT INTO Producer VALUES(101,'Jin',9000000000),
+(102,'Tim',8000000000),
+(103,'Ashely',7000000000),
+(104,'Christopher Nolan', 9876543210),
+(105,'James Cameron', 5555555555);
+Select *FROM Producer;
+
+CREATE TABLE Movie (
+  movie_id INT PRIMARY KEY,
+  movie_title VARCHAR(255) NOT NULL,
+  movie_year INT,
+  movie_lang VARCHAR(50),
+  prod_id INT,
+  FOREIGN KEY (prod_id) REFERENCES Producer(prod_id)
+  );
+  INSERT INTO Movie VALUES (1,'Avengers',2012,'English',101),
+ (2,'RRR',2022,'Telugu',103),
+ (3,'Highway',2012,'Hindi',102),
+ (4,'Titanic', 1997, 'English',105),
+ (5,'Incetion', 2010, 'English',104);
+  
+  Select *FROM Movie;
+  
+  CREATE TABLE Casting (
+  casting_id INT PRIMARY KEY,
+  movie_id INT,
+  art_id INT,
+  role VARCHAR(255),
+  FOREIGN KEY (movie_id) REFERENCES Movie(movie_id),
+  FOREIGN KEY (art_id) REFERENCES Artist(art_id)
+);
+INSERT INTO Casting Values(10,1,101,'Main lead'),
+(20,3,102,'Main lead'),
+(30,2,'103','Antagonist'),
+(40,4,105,'Main lead'),
+(50,1,104,'Main lead');
+
+Select *from Casting;
+
+CREATE TABLE StarRating (
+  rating_id INT PRIMARY KEY ,
+  movie_id INT,
+  rating DECIMAL(3, 1),
+  FOREIGN KEY (movie_id) REFERENCES Movie(movie_id)
+);
+INSERT INTO StarRating values(111,1,4.8),
+(112,2,5.0),
+(113,3,4.7),
+(114,4,4.8),
+(115,5,5.0);
+
+Select *from StarRating;
+
+CREATE TABLE MovieInfo (
+  movie_id INT PRIMARY KEY,
+  movie_plot TEXT,
+  status VARCHAR(50),
+  FOREIGN KEY (movie_id) REFERENCES Movie(movie_id)
+);
+Insert into MovieInfo values(1,' Earths mightiest heroes must come together and learn to fight as a team if they are going to stop the mischievous Loki and his alien army from enslaving humanity','BlockBuster'),
+(2,'A fearless revolutionary and an officer in the British force, who once shared a deep bond, decide to join forces and chart out an inspirational path of freedom against the despotic rulers','BlockBuster'),
+(3,'It tells the story of a girl who  for reasons later revealed, discovers freedom after being kidnapped','Hit'),
+(4,'Titanic is an epic action-packed romance set against the ill-fated maiden voyage of the R.M.S','BlockBuster'),
+(5,'Dom Cobb (Leonardo DiCaprio) is a thief with the rare ability to enter peoples dreams and steal their secrets from their subconscious','Hit');
+
+SELECT *FROM MOVIEINFO;
+
+#Query 1: LEFT OUTER JOIN ON TABLES ARTIST AND PRODUCER
+SELECT * FROM Artist
+LEFT OUTER JOIN Producer ON Artist.Art_id = Producer.prod_id;
+
+#Query2: RIGHT OUTER JOIN ON TABLES MOVIE AND CASTING
+SELECT * FROM Movie
+RIGHT OUTER JOIN Casting ON Movie.movie_id = Casting.movie_id;
+
+#QUERY 3: INNER JOIN ON TABLES ARTIST AND MOVIE
+SELECT *
+FROM Artist
+INNER JOIN Movie ON Artist.Art_id = Movie.prod_id;
+
+#QUERY 4: CROSS JOIN ON MOVIE AND STARRATING
+SELECT * FROM
+MOVIE CROSS JOIN STARRATING; 
+
+#QUERY 5: SELECTING MOVIES WITH A RATING ABOVE 4.5 FROM StarRating TABLE
+SELECT Movie.*
+FROM Movie
+JOIN StarRating ON Movie.movie_id = StarRating.movie_id
+WHERE StarRating.rating > 4.5;
+
+#QUERY 6: SELECTING MOVIES WITH A RAYING BELOW 5.0 FROM StarRating TABLE
+SELECT Movie.*
+FROM Movie
+JOIN StarRating ON Movie.movie_id = StarRating.movie_id
+WHERE StarRating.rating < 5.0;
+
+#QUERY 7: Selecting the movie plot and status for a specific movie:
+SELECT movie_plot, status
+FROM MovieInfo
+WHERE movie_id = 2;
+
+#QUERY 8: Updating  the status of a movie in the MovieInfo table:
+UPDATE MovieInfo
+SET status = 'Superhit'
+WHERE movie_id = 3;
+
+#QUERY 9: SELF JOIN ON TABLE CASTING
+SELECT c1.casting_id, c1.movie_id, c1.art_id, c1.role, c2.art_id AS other_art_id
+FROM Casting c1
+JOIN Casting c2 ON c1.movie_id = c2.movie_id;
+
+#QUERY 10: UPDATING INCEPTION WITH'INCEPTION' IN THE TABLE MOVIE
+UPDATE Movie
+SET movie_title = 'Inception'
+WHERE movie_id = 5;
+
+#QUERY 11: SELECTING MINIMUM RATING FROM STARRATING TABLE
+SELECT MIN(Rating) FROM starrating;
+
+#QUERY 12: SELECTING ROWS IN MovieInfor WHERE  STATUS IS NOT BlockBuster
+ SELECT * FROM MovieInfo
+ WHERE NOT Status='BlockBuster';
+ 
+#QUERY 13: SELECTING ROWS IN DESCENDING ORDER BASED ON RATING FROM STARRATING
+SELECT Rating from Starrating
+order by Rating desc;
+
+#QUERY14:GROUPING PRODUCERS BY THE FIRST LETTER OF THEIR NAMES AND COUNTING THE NUMBER OF PRODUCERS IN EACH GROUP.
+SELECT SUBSTRING(prod_name, 1, 1) AS first_letter, COUNT(*) AS count_producers
+FROM Producer
+GROUP BY SUBSTRING(prod_name, 1, 1);
+
+#QUERY 15: DISPLAYIG THE SECOND HIGHEST RATING FROM STARRATING
+SELECT MAX(rating) AS second_highest_rating
+FROM StarRating
+WHERE rating < (SELECT MAX(rating) FROM StarRating);
+
